@@ -1,0 +1,80 @@
+
+High resolution inverval timing facility.
+-----------------------------------------
+
+A facility for measuring time intervals with as much resolution as possible
+on the current platform. The api is designed for use in run time
+performance analisis where "stop watch and report" like behaviour is
+desired.
+
+Implementation Details
+----------------------
+
+The windows implementation is informed primarily by
+
+"Acquiring high-resolution time stamps"
+
+http://msdn.microsoft.com/en-us/library/windows/desktop/dn553408%28v=vs.85%29.aspx
+
+And the api documentation for QueryPerformanceCounter.
+
+Unresolved
+..........
+
+http://support.microsoft.com/?id=274323
+
+Determining the implementation at build time has issues:
+
+* linux kernel / libc mismatch may mean CLOCK id's are available at build
+  'configure' (HAVE_CLOCK_MONOTONIC) but are unavailable at run time.
+
+ERRORs
+------
+
+ERRORs are indicated by any non zero return. Where possible this value will
+be the untranslated operating system specific error code. However, in
+general, api users are not expected to react imediately to errors. The
+model is "if there was an error reading the timer, discard the data /
+ignore the result.
+
+ERRORS - Windows
+----------------
+
+The underlying implementation on windows will not return non zero for any
+api.
+
+Counter rollover - windows
+--------------------------
+
+On windows, the counter may run for 100 years from *BOOT* without rolling
+over.
+
+
+hirestime_accum
+---------------
+Accumulates the amount of time spent within two calls to hirestime_accum
+
+Assuming ctr refers to the same address, each 'odd' call results in ctr
+being set to the time spent "outside" the interval.  On each "even" call,
+ctr is left with the number of ticks spent within the two calls.
+
+hires_ctr acc={0};
+for (;;){
+
+ hirestime_accum(&acc); A
+ do stuff of interest
+
+ hirestime_accum(&acc); B
+
+ do other stuff
+}
+
+if acc is examined after A but before B, it represent the time to reach the
+for(;;) loop + the time spent doing "other stuff" If it is examined after B
+it represents the TOTAL time doing "stuff of interest" (for all iterations).
+Also if we ever break out of the for loop, acc will be left with the total
+time spent doing stuff of interest.
+
+
+
+
