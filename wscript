@@ -6,11 +6,17 @@ def options(opt):
     opt.load('compiler_c')
 
 def configure(conf):
-    conf.load('compiler_c')
+    conf.setenv('gcc')
+    conf.load('gcc')
     conf.env.CFLAGS = ['-g']
-    conf.env.LINKFLAGS_PLATFORM = [
-        '-mwindows' # Adds system libraries for windows for gcc on mingw
-        ]
+
+    # Adds system libraries for windows for gcc on mingw
+    if conf.env.DEST_OS.startswith('win'):
+        conf.env.LINKFLAGS_PLATFORM = [
+            '-mwindows'
+            ]
+    conf.setenv('msvc')
+    conf.load('msvc')
 
 
 @conf
@@ -33,9 +39,14 @@ def feature_test_program(bld):
 
 
 def build(bld):
-
-    #bld.program(source=['test-hirestime.c', 'hirestime.c'],
-    #        target='test-hirestime')
-    #return
-
     bld.recurse("hirestime")
+
+from waflib.Build import BuildContext, CleanContext, \
+        InstallContext, UninstallContext
+
+for x in 'gcc msvc'.split():
+        for y in (BuildContext, CleanContext, InstallContext, UninstallContext):
+                name = y.__name__.replace('Context','').lower()
+                class tmp(y):
+                        cmd = name + '-' + x
+                        variant = x

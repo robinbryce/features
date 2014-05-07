@@ -2,3 +2,7 @@
 *.tmp
 *.swp
 *~
+build
+mingw
+waf-1.7.15*
+.lock-waf*
