@@ -1,8 +1,17 @@
+#include "config.h"
 
+#if defined _WIN32 // Then we are windows 32 or 64 bit
 #include <windows.h> // for LARGE_INTEGER
 
 typedef LARGE_INTEGER hires_ctr;
 typedef LARGE_INTEGER hires_freq;
+
+#elif defined HAVE_CLOCK_MONOTONIC
+  #error "todo"
+#elif defined HAVE_GETTIMEOFDAY
+#else
+  #error "unsupported environment, no appropriate timing facilities - (neither CLOCK_MONOTONIC nor gettimeofday)"
+#endif
 
 
 int hirestime_freq(hires_freq *f);

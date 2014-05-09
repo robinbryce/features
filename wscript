@@ -25,6 +25,7 @@ def configure(conf):
     try:
         conf.load('gcc')
         conf.env.CFLAGS = ['-g']
+        conf.env.prepend_value('INCLUDES', [conf.path.get_bld().abspath()])
 
         # If we are mingw-gcc we need -mwindows, note that DEST_OS is
         # set by conf.load above.
@@ -33,6 +34,7 @@ def configure(conf):
             conf.env.LINKFLAGS_PLATFORM = [
                 '-mwindows'
                 ]
+        conf.write_config_header('config.h')
     except:
         conf.env.revert()
 
@@ -41,6 +43,8 @@ def configure(conf):
         conf.env.stash()
         try:
             conf.load('msvc')
+            conf.env.prepend_value('INCLUDES', ['.'])
+            conf.write_config_header('config.h')
         except:
             conf.env.revert()
 
