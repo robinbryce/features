@@ -1,7 +1,8 @@
+#!/usr/bin/env python
+
 import platform
 
 from waflib.Configure import conf
-import sys
 
 SYSTEM=platform.system().lower()
 VARIANTS=[]
@@ -9,6 +10,43 @@ if SYSTEM in ('linux', 'windows'):
     VARIANTS.append('gcc')
 if SYSTEM == 'windows':
     VARIANTS.append('msvc')
+
+def _check_clock_monotonic(conf, cross=False):
+    """ Can we make use of the posix monotonic clock ?
+
+    We verify both that we have the clock_getres api and that the
+    CLOCK_MONOTONIC clock id is supported.
+
+    If cross is False, we check runime support on the current BUILD host.
+    Otherwise we simply check we can compile with the appropriate api's and
+    defines referenced.
+
+    If yes, define "HAVE_CLOCK_MONOTONIC"
+
+
+    """
+    return conf.check_cc(fragment="""
+        # include <time.h>
+        int main() {
+            struct timespec res;
+            return clock_getres(CLOCK_MONOTONIC, &res);
+        }
+        """,
+        msg = "HAVE we got CLOCK_MONOTONIC ?",
+        execute=not cross, # execute the program to perform the test.
+        define_ret = False, # The exit status is 0 on success
+        define_name="HAVE_CLOCK_MONOTONIC",
+        mandatory=False # If the test fails we will fall back to
+                        # gettimeofday
+        )
+
+@conf
+def check_clock_monotonic(conf):
+    return _check_clock_monotonic(conf, cross=False)
+
+@conf
+def check_clock_monotonic_cross_cc(conf):
+    return _check_clock_monotonic(conf, cross=True)
 
 def options(opt):
     opt.load('compiler_c')
@@ -27,13 +65,18 @@ def configure(conf):
         conf.env.CFLAGS = ['-g']
         conf.env.prepend_value('INCLUDES', [conf.path.get_bld().abspath()])
 
-        # If we are mingw-gcc we need -mwindows, note that DEST_OS is
-        # set by conf.load above.
-
         if conf.env.DEST_OS.startswith('win'):
+            # If we are mingw-gcc we need -mwindows, note that DEST_OS is
+            # set by conf.load above.
             conf.env.LINKFLAGS_PLATFORM = [
                 '-mwindows'
                 ]
+        else:
+            # Assume posix like.
+
+            conf.check_clock_monotonic()
+            conf.check_clock_monotonic_cross_cc()
+
         conf.write_config_header('config.h')
     except:
         conf.env.revert()
@@ -43,7 +86,7 @@ def configure(conf):
         conf.env.stash()
         try:
             conf.load('msvc')
-            conf.env.prepend_value('INCLUDES', ['.'])
+            conf.env.prepend_value('INCLUDES', [conf.path.get_bld().abspath()])
             conf.write_config_header('config.h')
         except:
             conf.env.revert()
