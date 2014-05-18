@@ -17,51 +17,55 @@ hires_ctr * hirestime_accum(hires_ctr *ctr) {
     hires_ctr cur;
     (void)QueryPerformanceCounter(&cur);
     ctr->QuadPart = cur.QuadPart - ctr->QuadPart;
-
-    return 0;
+    return ctr;
 }
 
 // result = a - b
-hires_ctr * hirestime_sub(hires_ctr *result, hires_ctr const *a, hires_ctr const *b){
+hires_ctr hirestime_sub(hires_ctr a, hires_ctr b){
 
-    result->QuadPart = a->QuadPart - b->QuadPart;
-    return result;
-}
-hires_ctr * hirestime_add(hires_ctr *result, hires_ctr const *a, hires_ctr const *b){
-    result->QuadPart = a->QuadPart + b->QuadPart;
-    return result;
+    hires_ctr r;
+    r.QuadPart = a.QuadPart - b.QuadPart;
+    return r;
 }
 
-int hirestime_cmp0(hires_ctr const*val){
+hires_ctr hirestime_add(hires_ctr a, hires_ctr b){
+    hires_ctr r;
+    r.QuadPart = a.QuadPart + b.QuadPart;
+    return r;
+}
 
-    if (val->QuadPart < 0)
+int hirestime_cmp0(hires_ctr val){
+
+    if (val.QuadPart < 0)
         return -1;
-    if (val->QuadPart > 0)
+    if (val.QuadPart > 0)
         return 1;
     return 0;
 }
 
-int hirestime_cmp(hires_ctr const*a, hires_ctr const*b){
+int hirestime_cmp(hires_ctr a, hires_ctr b){
 
-    if (a->QuadPart > b->QuadPart)
+    if (a.QuadPart > b.QuadPart)
         return 1;
-    if (b->QuadPart > a->QuadPart)
+    if (b.QuadPart > a.QuadPart)
         return -1;
     return 0;
 }
-
 
 void hirestime_usec_set(hires_ctr *val, long long usec, hires_freq const *f){
     val->QuadPart = (f->QuadPart * usec) / 1000000;
 }
+
 void hirestime_dset_sec(hires_ctr *val, double sec, hires_freq const *f){
     val->QuadPart = (f->QuadPart * sec);
 }
-double hirestime_seconds(hires_ctr const *ctr, hires_freq const *f){
-    return (double)ctr->QuadPart / f->QuadPart;
+
+double hirestime_seconds(hires_ctr ctr, hires_freq const *f){
+    return (double)ctr.QuadPart / f->QuadPart;
 }
-double hirestime_usec(hires_ctr const *ctr, hires_freq const *f){
-    return ((double)ctr->QuadPart * 1000000) / f->QuadPart;
+
+double hirestime_usec(hires_ctr ctr, hires_freq const *f){
+    return ((double)ctr.QuadPart * 1000000) / f->QuadPart;
 }
 
 #elif defined HAVE_CLOCK_MONOTONIC
@@ -174,6 +178,7 @@ void hirestime_dset_sec(hires_ctr *val, double sec, hires_freq const *f){
 #elif defined HAVE_GETTIMEOFDAY
 #endif
 
+#if ! defined _WIN32
 hires_ctr *hirestime_accum(hires_ctr *ctr) {
 
     hires_ctr cur;
@@ -181,6 +186,7 @@ hires_ctr *hirestime_accum(hires_ctr *ctr) {
     *ctr = hirestime_sub(cur, *ctr);
     return ctr;
 }
+#endif // #if ! defined _WIN32
 
 hires_ctr hirestime_diffnow(hires_ctr prev){
     hires_ctr now;

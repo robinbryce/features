@@ -184,7 +184,7 @@ int test_seconds(){
     a.tv_nsec = 86156333;
 
 #else
-    hirestime_dsec_set(17 + 86156333 / 1000000000.0);
+    hirestime_dset_sec(&a, 17 + 86156333 / 1000000000.0, &f);
 #endif
     printf("[--------------------------------------]\n");
     printf("hirestime_seconds(");print_ctr(a); printf("\n");

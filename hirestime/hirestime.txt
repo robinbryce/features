@@ -18,6 +18,18 @@ http://msdn.microsoft.com/en-us/library/windows/desktop/dn553408%28v=vs.85%29.as
 
 And the api documentation for QueryPerformanceCounter.
 
+api
+...
+
+* On the assumption that the majority of implementations require smallish sized
+  data structs for hires_ctr, I chose to pass by value to api's which
+  *manipulate* counter values. It avoids pointer aliasing issues and gives the
+  compiler more latitude to re-arrange stuff.
+
+  However, I use ptr arguments for hires_freq as not all implementations
+  require a frequency argument.
+
+
 Unresolved
 ..........
 
