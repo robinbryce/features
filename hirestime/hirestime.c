@@ -105,6 +105,10 @@ int hirestime_cmp0(hires_ctr val){
         return -1;
     if (val.tv_sec > 0)
         return 1;
+    if (val.tv_nsec < 0)
+        return -1;
+    if (val.tv_nsec > 0)
+        return 1;
     return 0;
 }
 
