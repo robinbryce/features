@@ -13,6 +13,15 @@ void print_ctr(hires_ctr ctr){
     printf("counts = %d", ctr.QuadPart);
 #endif
 }
+void print_scaled(hires_ctr ctr, hires_freq f) {
+    double sec = hirestime_seconds(ctr, &f);
+    if (sec >= 1e-3)
+        printf ("%.0f ms", sec * 1e3);
+    else if (sec >= 1e-6)
+        printf ("%.0f us", sec * 1e6);
+    else
+        printf ("%.0f ns", sec * 1e9);
+}
 
 int test_set(void){
 
@@ -217,26 +226,18 @@ int hirestime_measure(hires_ctr *result, hires_ctr const *max,
     hirestime_read(&ctr_previous);
     ctr_end = hirestime_add(_max, ctr_previous);
 
-    printf("[--------------------------------------]\n");
-    printf("[ hirestime_measure\n");
-    printf("[--------------------------------------]\n");
-    printf("ctr_previous:");print_ctr(ctr_previous); printf("; _max: "); print_ctr(_max); printf("\n");
-    printf(" ctr_end -> ("); print_ctr(ctr_end); printf(")\n");
     a = hirestime_seconds(ctr_previous, &f);
     b = hirestime_seconds(_max, &f);
     c = hirestime_seconds(ctr_end, &f);
-    printf("%f + %f = %f ?\n", a, b, c);
 
     for (;;){
 
         int i;
 
         // test the time out.
-        if (hirestime_diffcmp0(ctr_end, *hirestime_read(&ctr_tmp)) <=0){
-
-            printf ("** timed out **\n");
+        if (hirestime_diffcmp0(ctr_end, *hirestime_read(&ctr_tmp)) <=0)
             goto measurement_end;
-        }
+
         if (points >= 3)
             // Once we manage 3 successful measurements, we are done.
             goto measurement_end;
@@ -301,6 +302,7 @@ void sleeper(void *ctx){
 # endif
 }
 
+
 int main(int argc, char**argv){
     int status;
     int measurements, cycles;
@@ -312,38 +314,39 @@ int main(int argc, char**argv){
 
     printf("running\n");
 
+#if 0
     test_set();
     test_diffcmp_add_sub();
     test_mincopy();
     test_seconds();
+#endif
 
     hirestime_freq(&f);
     hirestime_dset_sec(&max, 16.0, &f);
 
     //measure the quickest 'sleep'. note that sleep may be interupted before
     //the specified wait period due to interupts etc.
-    sleep_ms = 0;
+    sleep_ms = 23;
 
-    printf("sleep_ms %d\n", sleep_ms);
-
+    printf("----------------------------------------\n");
+    printf("hirestime_measure\n");
     status = hirestime_measure(&activity, &max,
             sleeper, (void*)&sleep_ms,
             &measurements, &cycles);
-    if (0 == status)
-        printf("%f sec [m %d, c %d] - shortest sleep(%d)\n",
-                hirestime_seconds(activity, &f),
-                measurements, cycles, sleep_ms
-                );
+
+    if (0 == status) {
+        printf("- "); print_scaled(activity, f);
+        printf(": sleep(%d) [m %d, c %d]\n",
+                sleep_ms, measurements, cycles
+              );
+    }
     status = hirestime_measure(&precision, &max, (void*)0, (void*)0,
             &measurements, &cycles);
     if (0 == status) {
-        printf("[m %d, c %d]\n", measurements, cycles);
-#if _WIN32
-        printf("%d counts - precision\n", precision.QuadPart);
-#endif
-        printf("%f sec - precision\n", hirestime_seconds(precision, &f));
+        printf("- "); print_scaled(precision, f);
+        printf(": precision [m %d, c %d]\n", measurements, cycles);
         printf("OK\n");
-    } else 
+    } else
         printf("error %d\n", status);
     return 0;
 }

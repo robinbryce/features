@@ -1,0 +1,8 @@
+#!/bin/bash
+# Wrapper for the benefit of eclipse
+set -e
+scriptdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+cd $scriptdir
+./waf build-gcc
+
