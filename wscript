@@ -112,7 +112,7 @@ def feature_test_program(bld):
 
 
 def build(bld):
-    bld.recurse("hirestime")
+    bld.recurse("spanclock")
 
 from waflib.Build import BuildContext, CleanContext, \
     InstallContext, UninstallContext
