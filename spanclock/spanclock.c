@@ -289,3 +289,114 @@ spanc_val spanclock_mincopy(spanc_val a, spanc_val b){
     return a;
 }
 
+// spanclock_measure
+//
+// *carefully* measure a "subject" activity that takes < max microseconds.
+//
+// max:
+//  defaults to 1 second (represented as 1000000 micro seconds)
+//
+// actitity:
+//  pointer to a function to time, pass NULL to measure the effective resolution
+//  of the timer implementation.
+//
+// activity_ctx:
+//  A single pointer value to provide some context to activity()
+//
+// See test-spanclock.c for example usage.
+//
+// derived from:-
+//  http://hg.python.org/peps/file/tip/pep-0418/clock_resolution.py
+//
+int spanclock_measure(spanc_val *result, spanc_val const *max,
+        void (*activity)(void *), void *activity_ctx,
+        int *measurements, int *cycles){
+
+    double a,b,c;
+    spanc_val _max;
+    int points = 0;
+    int got_first_measurement = 0;
+    spanc_val ctr_tmp, ctr_diff, ctr_end, ctr_previous, ctr_min;
+
+    if (measurements)
+        *measurements = 0;
+    if (cycles)
+        *cycles = 0;
+
+    // initialise our timeout.
+    if (!max)
+        spanclock_usec_set(&_max, 2000000);
+    else
+        _max = *max;
+
+    // initialise our starting point for "course" timers.
+    spanclock_read(&ctr_previous);
+    ctr_end = spanclock_add(_max, ctr_previous);
+
+    a = spanclock_seconds(ctr_previous);
+    b = spanclock_seconds(_max);
+    c = spanclock_seconds(ctr_end);
+
+    for (;;){
+
+        int i;
+
+        // test the time out.
+        if (spanclock_diffcmp0(ctr_end, *spanclock_read(&ctr_tmp)) <=0)
+            goto measurement_end;
+
+        if (points >= 3)
+            // Once we manage 3 successful measurements, we are done.
+            goto measurement_end;
+
+        // ok, make up to 10 attempts to time the activity
+
+        for (i=0; i < 10; i++){
+
+            spanclock_read(&ctr_tmp);
+            if (activity)
+                activity(activity_ctx);
+            ctr_diff = spanclock_diffnow(ctr_tmp);
+
+            if (measurements)
+                (*measurements) += 1;
+
+            if (spanclock_cmp0(ctr_diff) > 0)
+                goto measurement_made;
+        }
+
+        // if the current time is still reading behind or the same as the
+        // "previous" reading, keep going without updating ctr_previous, in
+        // this situation we are eventually going to find the (poor) precision
+        // or hit our timeout and fail.
+        ctr_diff = spanclock_diffnow(ctr_previous);
+        if (spanclock_cmp0(ctr_diff) <= 0){
+
+            if (cycles) (*cycles) += 1;
+
+            // note, we don't update ctr_previous ...
+            continue;
+        }
+
+measurement_made:
+        if (got_first_measurement){
+            ctr_min = spanclock_mincopy(ctr_min, ctr_diff);
+        } else {
+            ctr_min = ctr_diff;
+        }
+        points += 1;
+        spanclock_read(&ctr_previous);
+
+        if (cycles) (*cycles) += 1;
+    }
+
+measurement_end:
+
+    if (points >= 3) {
+        *result = ctr_min;
+        return 0;
+    }
+    return -1;
+}
+
+//:END

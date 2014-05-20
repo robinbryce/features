@@ -51,3 +51,7 @@ double spanclock_usec(spanc_val ctr);
 void spanclock_usec_set(spanc_val *val, long long usec);
 void spanclock_dset_sec(spanc_val *val, double sec);
 
+int spanclock_measure(spanc_val *result, spanc_val const *max,
+        void (*activity)(void *), void *activity_ctx,
+        int *measurements, int *cycles);
+//:END
