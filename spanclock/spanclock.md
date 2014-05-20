@@ -43,27 +43,29 @@ Determining the implementation at build time has issues:
 ERRORs
 ------
 
-ERRORs are indicated by any non zero return. Where possible this value will
-be the untranslated operating system specific error code. However, in
-general, api users are not expected to react imediately to errors. The
-model is "if there was an error reading the timer, discard the data /
-ignore the result.
+The possiblity of esoteric unlikely error values from system library calls are
+ignored. We assume that in this case the "read" values will be clearly invalid
+and the performance test re-run. For example the gettimeofday implementation
+ignores the return code from gettimeofday.
+
+spanclock_ xxx is designed to be used during development to narrow down
+performance issues.
 
 ERRORS - Windows
 ----------------
 
 The underlying implementation on windows will not return non zero for any
-api.
+api. ie "no errors" is a completely fair assumption always.
 
 Counter rollover - windows
 --------------------------
 
-On windows, the counter may run for 100 years from *BOOT* without rolling
-over.
+On windows, the counter may run for 100 years from *BOOT* without rolling over.
 
 
-hirestime_accum
+spanclock_accum
 ---------------
+
 Accumulates the amount of time spent within two calls to hirestime_accum
 
 Assuming ctr refers to the same address, each 'odd' call results in ctr
