@@ -8,8 +8,10 @@
 #endif
 
 void print_ctr(spanc_val ctr){
-#if defined SPANCLOCK_CLOCK_MONOTONIC
+#if defined SPANCLOCK_VAL_TIMESPEC
     printf("tv_sec = %ld, tv_nsec = %ld", ctr.tv_sec, ctr.tv_nsec);
+#elif defined SPANCLOCK_VAL_TIMEVAL
+    printf("tv_sec = %ld, tv_usec = %ld", ctr.tv_sec, ctr.tv_usec);
 #elif defined SPANCLOCK_QUERYPERFORMANCECOUNTER
     printf("counts = %d", ctr.QuadPart);
 #endif
@@ -288,7 +290,9 @@ void sleeper(void *ctx){
     Sleep(((DWORD) *(int*)ctx));
 # else
     struct timespec req, rem;
-    spanclock_usec_set(&req, *((int*)ctx) * 1000, NULL);
+    long long msec = *((int*)ctx);
+    req.tv_sec = msec / 1000;
+    req.tv_nsec = (msec - (req.tv_sec * 1000L)) * 1000000L;
     nanosleep(&req, &rem);
 # endif
 }

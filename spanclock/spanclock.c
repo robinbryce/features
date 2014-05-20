@@ -177,6 +177,85 @@ void spanclock_dset_sec(spanc_val *val, double sec){
 }
 
 #elif defined HAVE_GETTIMEOFDAY
+
+spanc_val * spanclock_read(spanc_val *ctr) {
+    (void)gettimeofday(ctr, 0);
+    return ctr;
+}
+
+int spanclock_cmp0(spanc_val val){
+
+    if (val.tv_sec < 0)
+        return -1;
+    if (val.tv_sec > 0)
+        return 1;
+    if (val.tv_usec < 0)
+        return -1;
+    if (val.tv_usec > 0)
+        return 1;
+    return 0;
+}
+
+// result = a - b
+spanc_val spanclock_sub(spanc_val a, spanc_val b){
+
+    spanc_val result;
+    if ( (a.tv_usec - b.tv_usec) < 0 ){
+        result.tv_sec = a.tv_sec - b.tv_sec - 1;
+        result.tv_usec = 1000000 + a.tv_usec - b.tv_usec;
+    } else {
+        result.tv_sec = a.tv_sec - b.tv_sec;
+        result.tv_usec = a.tv_usec - b.tv_usec;
+    }
+    return result;
+}
+
+spanc_val spanclock_add(spanc_val a, spanc_val b){
+
+    spanc_val result;
+    result.tv_sec = a.tv_sec + b.tv_sec;
+    result.tv_usec = a.tv_usec + b.tv_usec;
+    if (result.tv_usec >= 1000000L) {
+        result.tv_sec ++;
+        result.tv_usec = result.tv_usec - 1000000L;
+    }
+    return result;
+}
+
+int spanclock_cmp(spanc_val a, spanc_val b) {
+
+    if (a.tv_sec < b.tv_sec)
+        return -1;
+    else if (a.tv_sec > b.tv_sec)
+        return 1;
+    else if (a.tv_usec < b.tv_usec)
+        return -1;
+    else if (a.tv_usec > b.tv_usec)
+        return 1;
+    else
+        return 0;
+}
+
+double spanclock_seconds(spanc_val ctr){
+    return (double)ctr.tv_sec + ((double)ctr.tv_usec / 1000000);
+}
+
+double spanclock_usec(spanc_val ctr) {
+    return (double)ctr.tv_sec * 1000000 + (double)ctr.tv_usec;
+}
+
+void spanclock_usec_set(spanc_val *val, long long usec) {
+    val->tv_sec = usec / 1000000L;
+    val->tv_usec = usec - (val->tv_sec * 1000000L);
+}
+
+void spanclock_dset_sec(spanc_val *val, double sec){
+
+    val->tv_sec = (time_t)sec;
+    val->tv_usec = (suseconds_t) ((sec - (double) val->tv_sec) * 1000000.0);
+    if (sec < 0)
+        val->tv_usec *= -1.0;
+}
 #endif
 
 #if ! defined _WIN32

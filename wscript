@@ -11,10 +11,48 @@ if SYSTEM in ('linux', 'windows'):
 if SYSTEM == 'windows':
     VARIANTS.append('msvc')
 
+
+def _check_gettimeofday(conf, cross=False):
+    """ Can we make use of gettimeofday ?
+
+    If cross is False, we check runime support on the current BUILD host.
+    Otherwise we simply check we can compile with the appropriate api's and
+    defines referenced.
+
+    If yes, define "HAVE_GETTIMEOFDAY"
+
+
+    """
+    return conf.check_cc(fragment="""
+        # include <sys/time.h>
+        int main() {
+            struct timeval res;
+            return gettimeofday(&res, 0);
+        }
+        """,
+        msg = "HAVE we got gettimeofday ?",
+        execute=not cross, # execute the program to perform the test.
+        define_ret = False, # The exit status is 0 on success
+        define_name="HAVE_GETTIMEOFDAY",
+        mandatory=False # If the test fails we will fall back to
+                        # gettimeofday
+        )
+
+
+@conf
+def check_gettimeofday(conf):
+    return _check_gettimeofday(conf, cross=False)
+
+
+@conf
+def check_gettimeofday_cross_cc(conf):
+    return _check_gettimeofday(conf, cross=True)
+
+
 def _check_clock_monotonic(conf, cross=False):
     """ Can we make use of the posix monotonic clock ?
 
-    We verify both that we have the clock_getres api and that the
+    We verify both that we have the clock_gettime api and that the
     CLOCK_MONOTONIC clock id is supported.
 
     If cross is False, we check runime support on the current BUILD host.
@@ -29,7 +67,7 @@ def _check_clock_monotonic(conf, cross=False):
         # include <time.h>
         int main() {
             struct timespec res;
-            return clock_getres(CLOCK_MONOTONIC, &res);
+            return clock_gettime(CLOCK_MONOTONIC, &res);
         }
         """,
         msg = "HAVE we got CLOCK_MONOTONIC ?",
@@ -40,16 +78,20 @@ def _check_clock_monotonic(conf, cross=False):
                         # gettimeofday
         )
 
+
 @conf
 def check_clock_monotonic(conf):
     return _check_clock_monotonic(conf, cross=False)
+
 
 @conf
 def check_clock_monotonic_cross_cc(conf):
     return _check_clock_monotonic(conf, cross=True)
 
+
 def options(opt):
     opt.load('compiler_c')
+
 
 def configure(conf):
 
@@ -74,8 +116,10 @@ def configure(conf):
         else:
             # Assume posix like.
 
-            conf.check_clock_monotonic()
-            conf.check_clock_monotonic_cross_cc()
+            #conf.check_clock_monotonic()
+            #conf.check_clock_monotonic_cross_cc()
+            conf.check_gettimeofday()
+            conf.check_gettimeofday_cross_cc()
 
         conf.write_config_header('config.h')
     except:

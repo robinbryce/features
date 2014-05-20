@@ -4,6 +4,7 @@
 #include <windows.h> // for LARGE_INTEGER
 
 #define SPANCLOCK_QUERYPERFORMANCECOUNTER (1)
+#define SPANCLOCK_VAL_LARGE_INTEGER (1)
 
 typedef LARGE_INTEGER spanc_val;
 typedef LARGE_INTEGER spanc_freq;
@@ -11,15 +12,19 @@ typedef LARGE_INTEGER spanc_freq;
 #elif defined HAVE_CLOCK_MONOTONIC
 
 #define SPANCLOCK_CLOCK_MONOTONIC (1)
+#define SPANCLOCK_VAL_TIMESPEC (1)
+
 
 #include <time.h>
 
-typedef struct timespec spanc_freq;
 typedef struct timespec spanc_val;
 
 #elif defined HAVE_GETTIMEOFDAY
+#include <sys/time.h>
+typedef struct timeval spanc_val;
 
 #define SPANCLOCK_GETTIMEOFDAY (1)
+#define SPANCLOCK_VAL_TIMEVAL (1)
 
 #else
   #error "unsupported environment, no appropriate timing facilities - (neither CLOCK_MONOTONIC nor gettimeofday)"
