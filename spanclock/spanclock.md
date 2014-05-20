@@ -19,7 +19,7 @@ http://msdn.microsoft.com/en-us/library/windows/desktop/dn553408%28v=vs.85%29.as
 And the api documentation for QueryPerformanceCounter.
 
 api
-...
+---
 
 * On the assumption that the majority of implementations require smallish sized
   data structs for hires_ctr, I chose to pass by value to api's which
@@ -31,7 +31,7 @@ api
 
 
 Unresolved
-..........
+----------
 
 http://support.microsoft.com/?id=274323
 
@@ -72,22 +72,24 @@ Assuming ctr refers to the same address, each 'odd' call results in ctr
 being set to the time spent "outside" the interval.  On each "even" call,
 ctr is left with the number of ticks spent within the two calls.
 
-hires_ctr acc={0};
+spanc_ctr acc={0};
 for (;;){
 
- hirestime_accum(&acc); A
- do stuff of interest
+ spanclock_accum(&acc); // A
+ 
+ // do stuff of interest
 
- hirestime_accum(&acc); B
+ spanclock_accum(&acc); // B
 
- do other stuff
+ // do other stuff
 }
 
-if acc is examined after A but before B, it represent the time to reach the
-for(;;) loop + the time spent doing "other stuff" If it is examined after B
-it represents the TOTAL time doing "stuff of interest" (for all iterations).
-Also if we ever break out of the for loop, acc will be left with the total
-time spent doing stuff of interest.
+* if acc is examined after A but before B, it represent the time to reach the
+  for(;;) loop + the time spent doing "other stuff"
+
+* If it is examined after B it represents the TOTAL time doing
+  "stuff of interest" (for all iterations). Also if we ever break out of the 
+  for loop, acc will be left with the total time spent doing stuff of interest.
 
 
 
