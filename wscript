@@ -116,8 +116,8 @@ def configure(conf):
         else:
             # Assume posix like.
 
-            #conf.check_clock_monotonic()
-            #conf.check_clock_monotonic_cross_cc()
+            conf.check_clock_monotonic()
+            conf.check_clock_monotonic_cross_cc()
             conf.check_gettimeofday()
             conf.check_gettimeofday_cross_cc()
 
