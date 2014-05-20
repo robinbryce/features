@@ -9,9 +9,9 @@ aim than others.
 Goals
 =====
 
-1 For each feature to provide "example" quality documentation and references.
-2 For it to be possible to selectively enable or copy each feature independent
-  of the others.
+1. For each feature to provide "example" quality documentation and references.
+2. For it to be possible to selectively enable or copy each feature independent
+   of the others.
 
 
 In the pursuit of 2., if the resulting api's are to perverse, "features" will
