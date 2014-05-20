@@ -14,8 +14,8 @@ void print_ctr(spanc_val ctr){
     printf("counts = %d", ctr.QuadPart);
 #endif
 }
-void print_scaled(spanc_val ctr, spanc_freq f) {
-    double sec = spanclock_seconds(ctr, &f);
+void print_scaled(spanc_val ctr) {
+    double sec = spanclock_seconds(ctr);
     if (sec >= 1e-3)
         printf ("%.0f ms", sec * 1e3);
     else if (sec >= 1e-6)
@@ -26,69 +26,65 @@ void print_scaled(spanc_val ctr, spanc_freq f) {
 
 int test_set(void){
 
-    spanc_freq f;
     spanc_val v1, v2, v3;
-    spanclock_freq(&f);
 
     printf("[--------------------------------------]\n");
     printf("[test_set]\n");
 
     printf("_usec_set 1000000L (1.000)\n");
-    spanclock_usec_set(&v1, 1000000L, &f);
+    spanclock_usec_set(&v1, 1000000L);
     print_ctr(v1); printf("\n");
-    printf("_seconds() -> %f\n", spanclock_seconds(v1, &f));
+    printf("_seconds() -> %f\n", spanclock_seconds(v1));
 
     printf("_usec_set 1001000L (1.001)\n");
-    spanclock_usec_set(&v1, 1001000L, &f);
+    spanclock_usec_set(&v1, 1001000L);
     print_ctr(v1); printf("\n");
-    printf("_seconds() -> %f\n", spanclock_seconds(v1, &f));
+    printf("_seconds() -> %f\n", spanclock_seconds(v1));
 
     printf("_usec_set 1012000L (1.012)\n");
-    spanclock_usec_set(&v1, 1012000L, &f);
+    spanclock_usec_set(&v1, 1012000L);
     print_ctr(v1); printf("\n");
-    printf("_seconds() -> %f\n", spanclock_seconds(v1, &f));
+    printf("_seconds() -> %f\n", spanclock_seconds(v1));
 
     printf("_usec_set 500000L (0.5)\n");
-    spanclock_usec_set(&v1, 500000L, &f);
+    spanclock_usec_set(&v1, 500000L);
     print_ctr(v1); printf("\n");
-    printf("_seconds() -> %f\n", spanclock_seconds(v1, &f));
+    printf("_seconds() -> %f\n", spanclock_seconds(v1));
 
 
     printf("_dset_sec 1.0\n");
-    spanclock_dset_sec(&v1, 1.0, &f);
+    spanclock_dset_sec(&v1, 1.0);
     print_ctr(v1); printf("\n");
-    printf("_seconds() -> %f\n", spanclock_seconds(v1, &f));
+    printf("_seconds() -> %f\n", spanclock_seconds(v1));
 
     printf("_dset_sec 1.001\n");
-    spanclock_dset_sec(&v1, 1.001, &f);
+    spanclock_dset_sec(&v1, 1.001);
     print_ctr(v1); printf("\n");
-    printf("_seconds() -> %f\n", spanclock_seconds(v1, &f));
+    printf("_seconds() -> %f\n", spanclock_seconds(v1));
 
     printf("_dset_sec 1.012\n");
-    spanclock_dset_sec(&v1, 1.012, &f);
+    spanclock_dset_sec(&v1, 1.012);
     print_ctr(v1); printf("\n");
-    printf("_seconds() -> %f\n", spanclock_seconds(v1, &f));
+    printf("_seconds() -> %f\n", spanclock_seconds(v1));
 
     printf("_dset_sec 0.5\n");
-    spanclock_dset_sec(&v1, 0.5, &f);
+    spanclock_dset_sec(&v1, 0.5);
     print_ctr(v1); printf("\n");
-    printf("_seconds() -> %f\n", spanclock_seconds(v1, &f));
+    printf("_seconds() -> %f\n", spanclock_seconds(v1));
 
     return 0;
 }
 
 int test_diffcmp_add_sub(){
 
-    spanc_freq f;
     spanc_val a, b, b2;
-    spanclock_freq(&f);
 
     printf("[--------------------------------------]\n");
     printf("[test_diffcmp_add]\n");
 
-    spanclock_usec_set(&a, 500000L, &f);
-    spanclock_usec_set(&b, 500000L, &f);
-    spanclock_usec_set(&b2, 500001L, &f);
+    spanclock_usec_set(&a, 500000L);
+    spanclock_usec_set(&b, 500000L);
+    spanclock_usec_set(&b2, 500001L);
 
     printf("("); print_ctr(a); printf("), ("); print_ctr(b); printf(")\n");
     printf("_cmp=%d, _diffcmp0=%d\n", spanclock_cmp(a, b), spanclock_diffcmp0(a, b));
@@ -101,9 +97,9 @@ int test_diffcmp_add_sub(){
 
     printf("\n");
 
-    spanclock_usec_set(&a, 500000L, &f);
-    spanclock_usec_set(&b, 500000L, &f);
-    spanclock_usec_set(&b2, 500001L, &f);
+    spanclock_usec_set(&a, 500000L);
+    spanclock_usec_set(&b, 500000L);
+    spanclock_usec_set(&b2, 500001L);
 
     printf("("); print_ctr(a); printf("), ("); print_ctr(b); printf(")\n");
     printf("add -> ("); print_ctr(spanclock_add(a, b)); printf(")\n");
@@ -119,9 +115,9 @@ int test_diffcmp_add_sub(){
 
     printf("\n");
 
-    spanclock_usec_set(&a, 1500000L, &f);
-    spanclock_usec_set(&b, 1500000L, &f);
-    spanclock_usec_set(&b2, 500001L, &f);
+    spanclock_usec_set(&a, 1500000L);
+    spanclock_usec_set(&b, 1500000L);
+    spanclock_usec_set(&b2, 500001L);
 
     printf("("); print_ctr(a); printf("), ("); print_ctr(b); printf(")\n");
     printf("add -> ("); print_ctr(spanclock_add(a, b)); printf(")\n");
@@ -139,16 +135,14 @@ int test_diffcmp_add_sub(){
 }
 
 int test_mincopy(){
-    spanc_freq f;
     spanc_val a, b, b2;
-    spanclock_freq(&f);
 
     printf("[--------------------------------------]\n");
     printf("[test_mincopy]\n");
 
-    spanclock_usec_set(&a, 500000L, &f);
-    spanclock_usec_set(&b, 500000L, &f);
-    spanclock_usec_set(&b2, 500001L, &f);
+    spanclock_usec_set(&a, 500000L);
+    spanclock_usec_set(&b, 500000L);
+    spanclock_usec_set(&b2, 500001L);
 
     printf("mincopy ("); print_ctr(a); printf("), ("); print_ctr(b); printf(")\n");
     printf(" -> ("); print_ctr(spanclock_mincopy(a, b)); printf(")\n");
@@ -159,9 +153,9 @@ int test_mincopy(){
     printf("mincopy ("); print_ctr(b2); printf("), ("); print_ctr(a); printf(")\n");
     printf(" -> ("); print_ctr(spanclock_mincopy(b2, a)); printf(")\n");
 
-    spanclock_usec_set(&a, 1500000L, &f);
-    spanclock_usec_set(&b, 1500000L, &f);
-    spanclock_usec_set(&b2, 1500001L, &f);
+    spanclock_usec_set(&a, 1500000L);
+    spanclock_usec_set(&b, 1500000L);
+    spanclock_usec_set(&b2, 1500001L);
 
     printf("mincopy ("); print_ctr(a); printf("), ("); print_ctr(b); printf(")\n");
     printf(" -> ("); print_ctr(spanclock_mincopy(a, b)); printf(")\n");
@@ -176,20 +170,18 @@ int test_mincopy(){
 }
 
 int test_seconds(){
-    spanc_freq f;
     spanc_val a, b, b2;
-    spanclock_freq(&f);
 
 #if SPANCLOCK_CLOCK_MONOTONIC
     a.tv_sec = 17;
     a.tv_nsec = 86156333;
 
 #else
-    spanclock_dset_sec(&a, 17 + 86156333 / 1000000000.0, &f);
+    spanclock_dset_sec(&a, 17 + 86156333 / 1000000000.0);
 #endif
     printf("[--------------------------------------]\n");
     printf("spanclock_seconds(");print_ctr(a); printf("\n");
-    printf(" -> %f\n", spanclock_seconds(a, &f)); printf("\n");
+    printf(" -> %f\n", spanclock_seconds(a)); printf("\n");
 
     return 0;
 }
@@ -209,7 +201,6 @@ int spanclock_measure(spanc_val *result, spanc_val const *max,
     int points = 0;
     int got_first_measurement = 0;
     spanc_val ctr_tmp, ctr_diff, ctr_end, ctr_previous, ctr_min;
-    spanc_freq f;
 
     if (measurements)
         *measurements = 0;
@@ -217,9 +208,8 @@ int spanclock_measure(spanc_val *result, spanc_val const *max,
         *cycles = 0;
 
     // initialise our timeout.
-    spanclock_freq(&f);
     if (!max)
-        spanclock_usec_set(&_max, 2000000, &f);
+        spanclock_usec_set(&_max, 2000000);
     else
         _max = *max;
 
@@ -227,9 +217,9 @@ int spanclock_measure(spanc_val *result, spanc_val const *max,
     spanclock_read(&ctr_previous);
     ctr_end = spanclock_add(_max, ctr_previous);
 
-    a = spanclock_seconds(ctr_previous, &f);
-    b = spanclock_seconds(_max, &f);
-    c = spanclock_seconds(ctr_end, &f);
+    a = spanclock_seconds(ctr_previous);
+    b = spanclock_seconds(_max);
+    c = spanclock_seconds(ctr_end);
 
     for (;;){
 
@@ -308,7 +298,6 @@ int main(int argc, char**argv){
     int status;
     int measurements, cycles;
     unsigned int sleep_ms;
-    spanc_freq f;
     spanc_val max;
     spanc_val activity;
     spanc_val precision;
@@ -322,8 +311,7 @@ int main(int argc, char**argv){
     test_seconds();
 #endif
 
-    spanclock_freq(&f);
-    spanclock_dset_sec(&max, 16.0, &f);
+    spanclock_dset_sec(&max, 16.0);
 
     //measure the quickest 'sleep'. note that sleep may be interupted before
     //the specified wait period due to interupts etc.
@@ -336,7 +324,7 @@ int main(int argc, char**argv){
             &measurements, &cycles);
 
     if (0 == status) {
-        printf("- "); print_scaled(activity, f);
+        printf("- "); print_scaled(activity);
         printf(": sleep(%d) [m %d, c %d]\n",
                 sleep_ms, measurements, cycles
               );
@@ -344,7 +332,7 @@ int main(int argc, char**argv){
     status = spanclock_measure(&precision, &max, (void*)0, (void*)0,
             &measurements, &cycles);
     if (0 == status) {
-        printf("- "); print_scaled(precision, f);
+        printf("- "); print_scaled(precision);
         printf(": precision [m %d, c %d]\n", measurements, cycles);
         printf("OK\n");
     } else

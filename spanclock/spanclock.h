@@ -25,14 +25,6 @@ typedef struct timespec spanc_val;
   #error "unsupported environment, no appropriate timing facilities - (neither CLOCK_MONOTONIC nor gettimeofday)"
 #endif
 
-// NOTE: frequency on posix platforms
-//
-// For platforms with HAVE_CLOCK_MONOTONIC or HAVE_GETTIMEOFDAY frequency is
-// redundant. spanclock_freq will perform as expected but all other api's which
-// accept a spanc_freq parameter ignore the value. Where the parameter is a
-// pointer NULL is always safe.
-int spanclock_freq(spanc_freq *f);
-
 spanc_val * spanclock_read(spanc_val *ctr);
 spanc_val * spanclock_accum(spanc_val *ctr);
 
@@ -48,9 +40,9 @@ int spanclock_diffcmp0(spanc_val a, spanc_val b);
 
 spanc_val spanclock_mincopy(spanc_val a, spanc_val b);
 
-double spanclock_seconds(spanc_val ctr, spanc_freq const *f);
-double spanclock_usec(spanc_val ctr, spanc_freq const *f);
+double spanclock_seconds(spanc_val ctr);
+double spanclock_usec(spanc_val ctr);
 
-void spanclock_usec_set(spanc_val *val, long long usec, spanc_freq const *f);
-void spanclock_dset_sec(spanc_val *val, double sec, spanc_freq const *f);
+void spanclock_usec_set(spanc_val *val, long long usec);
+void spanclock_dset_sec(spanc_val *val, double sec);
 

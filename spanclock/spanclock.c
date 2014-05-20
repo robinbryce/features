@@ -2,9 +2,17 @@
 
 #if defined _WIN32 // Both 32 & 64 bit windows (cl.exe) define this.
 
-int spanclock_freq(spanc_freq *f){
-    (void)QueryPerformanceFrequency(f);
-    return 0;
+LONGLONG spanclock_freq(void){
+
+    static LONGLONG freq = 0;
+    if (freq == 0){
+
+        LARGE_INTEGER tmp;
+        // Succeedes on all supported windows platforms after windows xp
+        (void)QueryPerformanceFrequency(&tmp);
+        freq = tmp.QuadPart;
+    }
+    return freq;
 }
 
 spanc_val * spanclock_read(spanc_val *ctr) {
@@ -52,20 +60,20 @@ int spanclock_cmp(spanc_val a, spanc_val b){
     return 0;
 }
 
-void spanclock_usec_set(spanc_val *val, long long usec, spanc_freq const *f){
-    val->QuadPart = (f->QuadPart * usec) / 1000000;
+void spanclock_usec_set(spanc_val *val, long long usec){
+    val->QuadPart = (spanclock_freq() * usec) / 1000000;
 }
 
-void spanclock_dset_sec(spanc_val *val, double sec, spanc_freq const *f){
-    val->QuadPart = (f->QuadPart * sec);
+void spanclock_dset_sec(spanc_val *val, double sec){
+    val->QuadPart = (spanclock_freq() * sec);
 }
 
-double spanclock_seconds(spanc_val ctr, spanc_freq const *f){
-    return (double)ctr.QuadPart / f->QuadPart;
+double spanclock_seconds(spanc_val ctr){
+    return (double)ctr.QuadPart / spanclock_freq();
 }
 
-double spanclock_usec(spanc_val ctr, spanc_freq const *f){
-    return ((double)ctr.QuadPart * 1000000) / f->QuadPart;
+double spanclock_usec(spanc_val ctr){
+    return ((double)ctr.QuadPart * 1000000) / spanclock_freq();
 }
 
 #elif defined HAVE_CLOCK_MONOTONIC
@@ -90,14 +98,7 @@ double spanclock_usec(spanc_val ctr, spanc_freq const *f){
 // GIVEN all of the above we choose to IGNORE return codes from clock_getres and
 // clock_gettime
 //
-// But, to help cross implementations, spanclock_freq returns the integer
-// return value of clock_getres.
-//
-//
-//
-int spanclock_freq(spanc_freq *f){
-    return clock_getres(CLOCK_MONOTONIC, f);
-}
+
 spanc_val * spanclock_read(spanc_val *ctr) {
     clock_gettime(CLOCK_MONOTONIC, ctr);
     return ctr;
@@ -154,20 +155,20 @@ int spanclock_cmp(spanc_val a, spanc_val b) {
         return 0;
 }
 
-double spanclock_seconds(spanc_val ctr, spanc_freq const *f){
+double spanclock_seconds(spanc_val ctr){
     return (double)ctr.tv_sec + ((double)ctr.tv_nsec / 1000000000);
 }
 
-double spanclock_usec(spanc_val ctr, spanc_freq const *f) {
+double spanclock_usec(spanc_val ctr) {
     return (double)ctr.tv_sec * 1000000 + (double)ctr.tv_nsec / 1000;
 }
 
-void spanclock_usec_set(spanc_val *val, long long usec, spanc_freq const *f) {
+void spanclock_usec_set(spanc_val *val, long long usec) {
     val->tv_sec = usec / 1000000L;
     val->tv_nsec = (usec - (val->tv_sec * 1000000L)) * 1000L;
 }
 
-void spanclock_dset_sec(spanc_val *val, double sec, spanc_freq const *f){
+void spanclock_dset_sec(spanc_val *val, double sec){
 
     val->tv_sec = (time_t)sec;
     val->tv_nsec = (long) ((sec - (double) val->tv_sec) * 1000000000.0);
