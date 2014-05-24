@@ -1,0 +1,146 @@
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler:  
+Build flags: 
+Id flags: 
+
+The output was:
+1
+
+Microsoft (R) Visual Studio 11 Version 11.0.50214.1.
+Copyright (C) Microsoft Corp. All rights reserved.
+
+The evaluation period for Visual Studio Trial has ended.
+
+The evaluation period for this product has ended.
+
+Checking whether the CXX compiler is IAR using "" did not match "IAR .+ Compiler":
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler:  
+Build flags: 
+Id flags: 
+
+The output was:
+1
+
+Microsoft (R) Visual Studio 11 Version 11.0.50214.1.
+Copyright (C) Microsoft Corp. All rights reserved.
+
+The evaluation period for Visual Studio Trial has ended.
+
+The evaluation period for this product has ended.
+
+Checking whether the C compiler is IAR using "" did not match "IAR .+ Compiler":
+Determining if files pthread.h exist failed with the following output:
+
+Source:
+/* */
+#include <pthread.h>
+
+
+int main(){return 0;}
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler:  
+Build flags: 
+Id flags: 
+
+The output was:
+1
+
+Microsoft (R) Visual Studio 11 Version 11.0.50214.1.
+Copyright (C) Microsoft Corp. All rights reserved.
+
+The evaluation period for Visual Studio Trial has ended.
+
+The evaluation period for this product has ended.
+
+Checking whether the CXX compiler is IAR using "" did not match "IAR .+ Compiler":
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler:  
+Build flags: 
+Id flags: 
+
+The output was:
+1
+
+Microsoft (R) Visual Studio 11 Version 11.0.50214.1.
+Copyright (C) Microsoft Corp. All rights reserved.
+
+The evaluation period for Visual Studio Trial has ended.
+
+The evaluation period for this product has ended.
+
+Checking whether the C compiler is IAR using "" did not match "IAR .+ Compiler":
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler:  
+Build flags: 
+Id flags: 
+
+The output was:
+1
+
+Microsoft (R) Visual Studio 11 Version 11.0.50214.1.
+Copyright (C) Microsoft Corp. All rights reserved.
+
+The evaluation period for Visual Studio Trial has ended.
+
+The evaluation period for this product has ended.
+
+Checking whether the CXX compiler is IAR using "" did not match "IAR .+ Compiler":
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler:  
+Build flags: 
+Id flags: 
+
+The output was:
+1
+
+Microsoft (R) Visual Studio 11 Version 11.0.50214.1.
+Copyright (C) Microsoft Corp. All rights reserved.
+
+The evaluation period for Visual Studio Trial has ended.
+
+The evaluation period for this product has ended.
+
+Checking whether the C compiler is IAR using "" did not match "IAR .+ Compiler":
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler:  
+Build flags: 
+Id flags: 
+
+The output was:
+1
+
+Microsoft (R) Visual Studio 11 Version 11.0.50214.1.
+Copyright (C) Microsoft Corp. All rights reserved.
+
+The evaluation period for Visual Studio Trial has ended.
+
+The evaluation period for this product has ended.
+
+Checking whether the CXX compiler is IAR using "" did not match "IAR .+ Compiler":
+Compiling the C compiler identification source file "CMakeCCompilerId.c" failed.
+Compiler:  
+Build flags: 
+Id flags: 
+
+The output was:
+1
+
+Microsoft (R) Visual Studio 11 Version 11.0.50214.1.
+Copyright (C) Microsoft Corp. All rights reserved.
+
+The evaluation period for Visual Studio Trial has ended.
+
+The evaluation period for this product has ended.
+
+Checking whether the C compiler is IAR using "" did not match "IAR .+ Compiler":
+Determining if files pthread.h exist failed with the following output:
+
+Source:
+/* */
+#include <pthread.h>
+
+
+int main(){return 0;}
+

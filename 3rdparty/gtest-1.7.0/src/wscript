@@ -1,0 +1,22 @@
+from os.path import abspath, join
+
+import glob
+
+def options(opt):
+    opt.load('compiler_cxx')
+def configure(conf):
+    conf.load('compiler_cxx')
+    conf.load('g++')
+    conf.env.prepend_value('INCLUDES', conf.path.abspath())
+    conf.env.prepend_value('INCLUDES',
+        abspath(join(conf.path.abspath(), '../include')))
+
+def build(bld):
+    bld.stlib(source='gtest-all.cc', target='gtest-all')
+    bld.stlib(source='gtest_main.cc', target='gtest_main')
+    #GTEST_SRCS_ = glob.glob("*.cc")
+    #for dep in GTEST_SRCS_:
+    #    bld.add_manual_dependency('gtest-all.cc', bld.find_node(dep))
+    #    bld.add_manual_dependency('gtest_main.cc', bld.find_node(dep))
+
+#:END
