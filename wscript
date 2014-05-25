@@ -91,6 +91,7 @@ def check_clock_monotonic_cross_cc(conf):
 
 def options(opt):
     opt.load('compiler_c')
+    opt.load('compiler_cxx')
 
 
 def configure(conf):
@@ -134,6 +135,9 @@ def configure(conf):
             conf.write_config_header('config.h')
         except:
             conf.env.revert()
+    conf.recurse("spanclock")
+    conf.recurse("3rdparty/gtest-1.7.0/src")
+
 
 
 @conf
@@ -157,6 +161,7 @@ def feature_test_program(bld):
 
 def build(bld):
     bld.recurse("spanclock")
+    bld.recurse("3rdparty/gtest-1.7.0/src")
 
 from waflib.Build import BuildContext, CleanContext, \
     InstallContext, UninstallContext
