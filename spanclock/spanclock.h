@@ -61,5 +61,16 @@ int spanclock_measure(spanc_val *result, spanc_val const *max,
 
 #ifdef __cplusplus
 };
+
+inline bool operator==(spanc_val a, spanc_val b){
+	return spanclock_cmp(a, b) == 0;
+}
+inline spanc_val operator-(spanc_val a, spanc_val b){
+	return spanclock_sub(a, b);
+}
+inline spanc_val operator+(spanc_val a, spanc_val b){
+	return spanclock_add(a, b);
+}
+
 #endif // #ifdef __cplusplus
 //:END

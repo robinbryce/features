@@ -15,25 +15,17 @@ def configure(conf):
 
     for variant in conf.env.VARIANTS:
 
-        # TODO: find out how to pass state down through recursive configure's
-        #for variant in ['gcc', 'msvc']:
         tool = tool_for_variant[variant]
         conf.setenv(variant, conf.all_envs[variant])
         conf.env.stash()
         try:
             conf.load(tool)
 
-
             if variant == 'msvc':
                 # http://stackoverflow.com/questions/12558327/google-test-in-visual-studio-2012
                 # But note that this is resolved in upstream:
                 #   https://code.google.com/p/googletest/source/detail?r=675
                 conf.env.prepend_value('DEFINES', '_VARIADIC_MAX=10')
-
-            #conf.env.STLIB_gtest=['gtest']
-            #conf.env.STLIBPATH_gtest=[conf.path.abspath()]
-            #conf.env.INCLUDES_gtest=[abj(
-            #        conf.path.abspath(), '../includes')]
 
         except:
             conf.env.revert()

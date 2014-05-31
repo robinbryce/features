@@ -78,115 +78,80 @@ int test_set(void){
     return 0;
 }
 
-int test_diffcmp_add_sub(){
+TEST(spanclock, diffcmp_add_sub){
 
-    spanc_val a, b, b2;
+	spanc_val a, b, b2;
 
-    printf("[--------------------------------------]\n");
-    printf("[test_diffcmp_add]\n");
+	spanclock_usec_set(&a, 500000L);
+	spanclock_usec_set(&b, 500000L);
+	spanclock_usec_set(&b2, 500001L);
 
-    spanclock_usec_set(&a, 500000L);
-    spanclock_usec_set(&b, 500000L);
-    spanclock_usec_set(&b2, 500001L);
+	EXPECT_EQ(spanclock_cmp(a,b), 0);
+	EXPECT_EQ(spanclock_diffcmp0(a,b), 0);
 
-    printf("("); print_ctr(a); printf("), ("); print_ctr(b); printf(")\n");
-    printf("_cmp=%d, _diffcmp0=%d\n", spanclock_cmp(a, b), spanclock_diffcmp0(a, b));
+	EXPECT_EQ(spanclock_cmp(a, b2), -1);
+	EXPECT_EQ(spanclock_diffcmp0(a, b2), -1);
 
-    printf("("); print_ctr(a); printf("), ("); print_ctr(b2); printf(")\n");
-    printf("_cmp=%d, _diffcmp0=%d\n", spanclock_cmp(a, b2), spanclock_diffcmp0(a, b2));
+	EXPECT_EQ(spanclock_cmp(b2, a), 1);
+	EXPECT_EQ(spanclock_diffcmp0(b2, a), 1);
 
-    printf("("); print_ctr(b2); printf("), ("); print_ctr(a); printf(")\n");
-    printf("_cmp=%d, _diffcmp0=%d\n", spanclock_cmp(b2, a), spanclock_diffcmp0(b2, a));
+	EXPECT_FLOAT_EQ(1.0, spanclock_seconds(spanclock_add(a, b)));
+	EXPECT_FLOAT_EQ(0.0, spanclock_seconds(spanclock_sub(a, b)));
 
-    printf("\n");
+	EXPECT_FLOAT_EQ(1.0, spanclock_seconds(spanclock_add(b, a)));
+	EXPECT_FLOAT_EQ(0.0, spanclock_seconds(spanclock_sub(b, a)));
 
-    spanclock_usec_set(&a, 500000L);
-    spanclock_usec_set(&b, 500000L);
-    spanclock_usec_set(&b2, 500001L);
+	EXPECT_FLOAT_EQ(1.000001, spanclock_seconds(spanclock_add(a, b2)));
+	EXPECT_FLOAT_EQ(-0.000001, spanclock_seconds(spanclock_sub(a, b2)));
 
-    printf("("); print_ctr(a); printf("), ("); print_ctr(b); printf(")\n");
-    printf("add -> ("); print_ctr(spanclock_add(a, b)); printf(")\n");
-    printf("sub -> ("); print_ctr(spanclock_sub(a, b)); printf(")\n");
+	spanclock_usec_set(&a, 1500000L);
+	spanclock_usec_set(&b, 1500000L);
+	spanclock_usec_set(&b2, 500001L);
 
-    printf("("); print_ctr(b); printf("), ("); print_ctr(a); printf(")\n");
-    printf("add -> ("); print_ctr(spanclock_add(b, a)); printf(")\n");
-    printf("sub -> ("); print_ctr(spanclock_sub(b, a)); printf(")\n");
+	EXPECT_FLOAT_EQ(3.0,spanclock_seconds(spanclock_add(a, b)));
+	EXPECT_FLOAT_EQ(0.0,spanclock_seconds(spanclock_sub(a, b)));
 
-    printf("("); print_ctr(a); printf("), ("); print_ctr(b2); printf(")\n");
-    printf("add -> ("); print_ctr(spanclock_add(a, b2)); printf(")\n");
-    printf("sub -> ("); print_ctr(spanclock_sub(a, b2)); printf(")\n");
+	EXPECT_FLOAT_EQ(3.0,spanclock_seconds(spanclock_add(b, a)));
+	EXPECT_FLOAT_EQ(0.0,spanclock_seconds(spanclock_sub(b, a)));
 
-    printf("\n");
+	EXPECT_FLOAT_EQ(2.000001, spanclock_seconds(spanclock_add(a, b2)));
+	EXPECT_FLOAT_EQ(0.999999, spanclock_seconds(spanclock_sub(a, b2)));
 
-    spanclock_usec_set(&a, 1500000L);
-    spanclock_usec_set(&b, 1500000L);
-    spanclock_usec_set(&b2, 500001L);
-
-    printf("("); print_ctr(a); printf("), ("); print_ctr(b); printf(")\n");
-    printf("add -> ("); print_ctr(spanclock_add(a, b)); printf(")\n");
-    printf("sub -> ("); print_ctr(spanclock_sub(a, b)); printf(")\n");
-
-    printf("("); print_ctr(b); printf("), ("); print_ctr(a); printf(")\n");
-    printf("add -> ("); print_ctr(spanclock_add(b, a)); printf(")\n");
-    printf("sub -> ("); print_ctr(spanclock_sub(b, a)); printf(")\n");
-
-    printf("("); print_ctr(a); printf("), ("); print_ctr(b2); printf(")\n");
-    printf("add -> ("); print_ctr(spanclock_add(a, b2)); printf(")\n");
-    printf("sub -> ("); print_ctr(spanclock_sub(a, b2)); printf(")\n");
-
-    return 0;
 }
 
-int test_mincopy(){
-    spanc_val a, b, b2;
+TEST(spanclock, mincopy){
 
-    printf("[--------------------------------------]\n");
-    printf("[test_mincopy]\n");
+	spanc_val a, b, b2;
 
-    spanclock_usec_set(&a, 500000L);
-    spanclock_usec_set(&b, 500000L);
-    spanclock_usec_set(&b2, 500001L);
+	spanclock_usec_set(&a, 500000L);
+	spanclock_usec_set(&b, 500000L);
+	spanclock_usec_set(&b2, 500001L);
 
-    printf("mincopy ("); print_ctr(a); printf("), ("); print_ctr(b); printf(")\n");
-    printf(" -> ("); print_ctr(spanclock_mincopy(a, b)); printf(")\n");
+	EXPECT_EQ(spanclock_mincopy(a, b), a);
+	EXPECT_EQ(spanclock_mincopy(a, b2), a);
+	EXPECT_EQ(spanclock_mincopy(b2, a), a);
 
-    printf("mincopy ("); print_ctr(a); printf("), ("); print_ctr(b2); printf(")\n");
-    printf(" -> ("); print_ctr(spanclock_mincopy(a, b2)); printf(")\n");
+	spanclock_usec_set(&a, 1500000L);
+	spanclock_usec_set(&b, 1500000L);
+	spanclock_usec_set(&b2, 1500001L);
 
-    printf("mincopy ("); print_ctr(b2); printf("), ("); print_ctr(a); printf(")\n");
-    printf(" -> ("); print_ctr(spanclock_mincopy(b2, a)); printf(")\n");
-
-    spanclock_usec_set(&a, 1500000L);
-    spanclock_usec_set(&b, 1500000L);
-    spanclock_usec_set(&b2, 1500001L);
-
-    printf("mincopy ("); print_ctr(a); printf("), ("); print_ctr(b); printf(")\n");
-    printf(" -> ("); print_ctr(spanclock_mincopy(a, b)); printf(")\n");
-
-    printf("mincopy ("); print_ctr(a); printf("), ("); print_ctr(b2); printf(")\n");
-    printf(" -> ("); print_ctr(spanclock_mincopy(a, b2)); printf(")\n");
-
-    printf("mincopy ("); print_ctr(b2); printf("), ("); print_ctr(a); printf(")\n");
-    printf(" -> ("); print_ctr(spanclock_mincopy(b2, a)); printf(")\n");
-
-    return 0;
+	EXPECT_EQ(spanclock_mincopy(a, b), a);
+	EXPECT_EQ(spanclock_mincopy(a, b2), a);
+	EXPECT_EQ(spanclock_mincopy(b2, a), a);
 }
 
-int test_seconds(){
-    spanc_val a, b, b2;
+TEST(spanclock, seconds){
+
+	spanc_val a, b, b2;
 
 #if SPANCLOCK_CLOCK_MONOTONIC
-    a.tv_sec = 17;
-    a.tv_nsec = 86156333;
+	a.tv_sec = 17;
+	a.tv_nsec = 86156333;
 
 #else
-    spanclock_dset_sec(&a, 17 + 86156333 / 1000000000.0);
+	spanclock_dset_sec(&a, 17 + 86156333 / 1000000000.0);
 #endif
-    printf("[--------------------------------------]\n");
-    printf("spanclock_seconds(");print_ctr(a); printf("\n");
-    printf(" -> %f\n", spanclock_seconds(a)); printf("\n");
-
-    return 0;
+	EXPECT_FLOAT_EQ(spanclock_seconds(a), 17 + 86156333 / 1000000000.0);
 }
 
 void sleeper(void *ctx){
@@ -201,49 +166,52 @@ void sleeper(void *ctx){
 # endif
 }
 
+TEST(spanclock, measure){
+
+	int status;
+	int measurements, cycles;
+	unsigned int sleep_ms;
+	spanc_val max;
+	spanc_val activity;
+	spanc_val precision;
+
+	spanclock_dset_sec(&max, 16.0);
+
+	//measure the quickest 'sleep'. note that sleep may be interupted before
+	//the specified wait period due to interupts etc.
+	sleep_ms = 23;
+
+	printf(" spanclock_measure with sleeper(ms=%d)\n", sleep_ms);
+
+	status = spanclock_measure(&activity, &max,
+		sleeper, (void*)&sleep_ms,
+		&measurements, &cycles);
+
+	EXPECT_EQ(status, 0);
+
+	if (0 == status) {
+		printf(" - "); print_scaled(activity);
+		printf(" : sleep(%d) [m %d, c %d]\n",
+				sleep_ms, measurements, cycles
+			);
+	}
+
+	printf(" spanclock_measure finest granularity (precision)\n", sleep_ms);
+
+	status = spanclock_measure(&precision, &max, ((void(*)(void*))0), (void*)0,
+			&measurements, &cycles);
+
+	EXPECT_EQ(status, 0);
+
+	if (0 == status) {
+		printf(" - "); print_scaled(precision);
+		printf(" : precision [m %d, c %d]\n", measurements, cycles);
+	}
+}
 
 int main(int argc, char**argv){
-    int status;
-    int measurements, cycles;
-    unsigned int sleep_ms;
-    spanc_val max;
-    spanc_val activity;
-    spanc_val precision;
 
-    printf("running\n");
+    ::testing::InitGoogleTest(&argc, argv);
 
-#if 1
-    test_set();
-    test_diffcmp_add_sub();
-    test_mincopy();
-    test_seconds();
-#endif
-
-    spanclock_dset_sec(&max, 16.0);
-
-    //measure the quickest 'sleep'. note that sleep may be interupted before
-    //the specified wait period due to interupts etc.
-    sleep_ms = 23;
-
-    printf("----------------------------------------\n");
-    printf("spanclock_measure\n");
-    status = spanclock_measure(&activity, &max,
-            sleeper, (void*)&sleep_ms,
-            &measurements, &cycles);
-
-    if (0 == status) {
-        printf("- "); print_scaled(activity);
-        printf(": sleep(%d) [m %d, c %d]\n",
-                sleep_ms, measurements, cycles
-              );
-    }
-    status = spanclock_measure(&precision, &max, ((void(*)(void*))0), (void*)0,
-            &measurements, &cycles);
-    if (0 == status) {
-        printf("- "); print_scaled(precision);
-        printf(": precision [m %d, c %d]\n", measurements, cycles);
-        printf("OK\n");
-    } else
-        printf("error %d\n", status);
-    return 0;
+    return RUN_ALL_TESTS();
 }
