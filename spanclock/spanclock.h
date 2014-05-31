@@ -30,6 +30,10 @@ typedef struct timeval spanc_val;
   #error "unsupported environment, no appropriate timing facilities - (neither CLOCK_MONOTONIC nor gettimeofday)"
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 spanc_val * spanclock_read(spanc_val *ctr);
 spanc_val * spanclock_accum(spanc_val *ctr);
 
@@ -54,4 +58,8 @@ void spanclock_dset_sec(spanc_val *val, double sec);
 int spanclock_measure(spanc_val *result, spanc_val const *max,
         void (*activity)(void *), void *activity_ctx,
         int *measurements, int *cycles);
+
+#ifdef __cplusplus
+};
+#endif // #ifdef __cplusplus
 //:END

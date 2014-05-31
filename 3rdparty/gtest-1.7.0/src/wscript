@@ -2,21 +2,51 @@ from os.path import abspath, join
 
 import glob
 
+def abj(*args):
+    return abspath(join(*args))
+
 def options(opt):
     opt.load('compiler_cxx')
+
+
+tool_for_variant = dict(gcc='g++', msvc='msvc')
+
 def configure(conf):
-    conf.load('compiler_cxx')
-    conf.load('g++')
-    conf.env.prepend_value('INCLUDES', conf.path.abspath())
-    conf.env.prepend_value('INCLUDES',
-        abspath(join(conf.path.abspath(), '../include')))
+
+    for variant in conf.env.VARIANTS:
+
+        # TODO: find out how to pass state down through recursive configure's
+        #for variant in ['gcc', 'msvc']:
+        tool = tool_for_variant[variant]
+        conf.setenv(variant, conf.all_envs[variant])
+        conf.env.stash()
+        try:
+            conf.load(tool)
+
+
+            if variant == 'msvc':
+                # http://stackoverflow.com/questions/12558327/google-test-in-visual-studio-2012
+                # But note that this is resolved in upstream:
+                #   https://code.google.com/p/googletest/source/detail?r=675
+                conf.env.prepend_value('DEFINES', '_VARIADIC_MAX=10')
+
+            #conf.env.STLIB_gtest=['gtest']
+            #conf.env.STLIBPATH_gtest=[conf.path.abspath()]
+            #conf.env.INCLUDES_gtest=[abj(
+            #        conf.path.abspath(), '../includes')]
+
+        except:
+            conf.env.revert()
+
 
 def build(bld):
-    bld.stlib(source='gtest-all.cc', target='gtest-all')
-    bld.stlib(source='gtest_main.cc', target='gtest_main')
-    #GTEST_SRCS_ = glob.glob("*.cc")
-    #for dep in GTEST_SRCS_:
-    #    bld.add_manual_dependency('gtest-all.cc', bld.find_node(dep))
-    #    bld.add_manual_dependency('gtest_main.cc', bld.find_node(dep))
+    bld.stlib(source='gtest-all.cc', target='gtest-all', name="gtest-all",
+            includes=". .. ../include", export_includes="../include")
+    bld.stlib(source='gtest_main.cc', target='gtest_main', name="gtest_main",
+            includes=". .. ../include", export_includes="../include")
+    GTEST_SRCS_ = glob.glob("*.cc")
+    for dep in GTEST_SRCS_:
+        bld.add_manual_dependency('gtest-all.cc', bld.find_node(dep))
+        bld.add_manual_dependency('gtest_main.cc', bld.find_node(dep))
 
 #:END

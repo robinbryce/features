@@ -1,8 +1,14 @@
 #!/usr/bin/env python
 
+from os.path import abspath, join
+from itertools import chain
+
 import platform
 
 from waflib.Configure import conf
+
+def abj(*p):
+    return abspath(join(*p))
 
 SYSTEM=platform.system().lower()
 VARIANTS=[]
@@ -96,72 +102,120 @@ def options(opt):
 
 def configure(conf):
 
+    env = conf.env
+
+    # A related case is how to add the top-level directory containing a configuration header
+
     if not VARIANTS:
         conf.fatal('No variants enabled for system "%s"', SYSTEM)
 
+    conf.env.VARIANTS = VARIANTS
+
     # Check for gcc on windows, as it picks up mingw-gcc
     assert 'gcc' in VARIANTS
-    conf.setenv('gcc')
+    conf.setenv('gcc', conf.env.derive())
     conf.env.stash()
     try:
+
+        # Include path for variant "config.h"
+        conf.env.INCLUDES_config = [
+                join(conf.path.get_bld().abspath(), 'gcc')]
+
         conf.load('gcc')
         conf.env.CFLAGS = ['-g']
-        conf.env.prepend_value('INCLUDES', [conf.path.get_bld().abspath()])
 
         if conf.env.DEST_OS.startswith('win'):
             # If we are mingw-gcc we need -mwindows, note that DEST_OS is
             # set by conf.load above.
-            conf.env.LINKFLAGS_PLATFORM = [
+            conf.env.LINKFLAGS_platform = [
                 '-mwindows'
                 ]
-        else:
-            # Assume posix like.
 
-            conf.check_clock_monotonic()
-            conf.check_clock_monotonic_cross_cc()
-            conf.check_gettimeofday()
-            conf.check_gettimeofday_cross_cc()
+        conf.check_clock_monotonic()
+        conf.check_clock_monotonic_cross_cc()
+        conf.check_gettimeofday()
+        conf.check_gettimeofday_cross_cc()
 
-        conf.write_config_header('config.h')
     except:
         conf.env.revert()
 
+    conf.setenv('') # Restore default environ
+
     if 'msvc' in VARIANTS:
-        conf.setenv('msvc')
+        conf.setenv('msvc', env.derive())
         conf.env.stash()
         try:
+            # Include path for variant "config.h"
+            conf.env.INCLUDES_config = [
+                    join(conf.path.get_bld().abspath(), 'msvc')]
+
             conf.load('msvc')
-            conf.env.prepend_value('INCLUDES', [conf.path.get_bld().abspath()])
-            conf.write_config_header('config.h')
+
+            conf.check_gettimeofday()
+            conf.check_gettimeofday_cross_cc()
+
         except:
             conf.env.revert()
-    conf.recurse("spanclock")
+
+    conf.setenv('') # Restore default environ
     conf.recurse("3rdparty/gtest-1.7.0/src")
+
+    conf.setenv('') # Restore default environ
+    conf.recurse("spanclock")
+
+    # Write out the variant specific config.h
+    for v in VARIANTS:
+        conf.setenv(v)
+        conf.write_config_header(join(v, 'config.h'))
+
+    conf.setenv('') # Restore default environ
 
 
 
 @conf
-def feature_test_program(bld):
+def feature_test_program(bld, **prgkw):
     """Add test programs.
 
     Finds all files matching test-*.c which are accompanied by a single file
     which can be produced by striping test- from the match.
 
+    We accomodate a cpp file wrapping a c file provided both have the same base
+    name, in which case the cpp should #include the c file.
+
     test-foo.c, foo.c -> test-foo.exe
     test-foo.c, foo-bar.c -> None
 
     """
-    for test in bld.path.ant_glob('test-*.c'):
-        feat=test.parent.find_node(str(test).replace('test-', '', 1))
-        if feat is None:
-            continue
-        bld.program(source=[test, feat], target=str(feat).rsplit('.', 1)[0],
-            use='PLATFORM')
+
+    if 'use' not in prgkw:
+        prgkw['use'] = 'platform config'
+
+    for test in chain(
+            bld.path.ant_glob('test-*.c'),
+            bld.path.ant_glob('test-*.cpp')):
+
+        # produce the basename of the feature by removing the 'test-' prefix
+        # and the file extention from the test file name.
+        featbasename = str(test).rsplit('.', 1)[0].replace('test-', '', 1)
+
+        for ext in [".cpp", ".c"]:
+
+            # If there are both .c and .cpp interfaces, assume we have .cpp
+            # wrapping (via #include) a .c interface. If .cpp is found first we
+            # will NOT create a node for the .c
+
+            feat = test.parent.find_node(featbasename + ext)
+            if feat is not None:
+                bld.program(source=[test, feat], target=featbasename, **prgkw)
+                break
+        else:
+            bld.fatal("No implementation for %s" % str(test))
+
 
 
 def build(bld):
-    bld.recurse("spanclock")
     bld.recurse("3rdparty/gtest-1.7.0/src")
+    bld.recurse("spanclock")
 
 from waflib.Build import BuildContext, CleanContext, \
     InstallContext, UninstallContext

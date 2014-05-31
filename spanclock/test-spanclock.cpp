@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <assert.h>
+#include "gtest/gtest.h"
 #include "spanclock.h"
 
 #if defined SPANCLOCK_CLOCK_MONOTONIC
@@ -236,7 +237,7 @@ int main(int argc, char**argv){
                 sleep_ms, measurements, cycles
               );
     }
-    status = spanclock_measure(&precision, &max, (void*)0, (void*)0,
+    status = spanclock_measure(&precision, &max, ((void(*)(void*))0), (void*)0,
             &measurements, &cycles);
     if (0 == status) {
         printf("- "); print_scaled(precision);
