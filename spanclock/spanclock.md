@@ -22,12 +22,10 @@ api
 ---
 
 * On the assumption that the majority of implementations require smallish sized
-  data structs for hires_ctr, I chose to pass by value to api's which
+  data structs for spanc_val, I chose to 'pass by value' for api's which
   *manipulate* counter values. It avoids pointer aliasing issues and gives the
   compiler more latitude to re-arrange stuff.
-
-  However, I use ptr arguments for hires_freq as not all implementations
-  require a frequency argument.
+* Where possible, return signature makes the api friendly to composition of operations.
 
 
 Unresolved
@@ -37,8 +35,13 @@ http://support.microsoft.com/?id=274323
 
 Determining the implementation at build time has issues:
 
-* linux kernel / libc mismatch may mean CLOCK id's are available at build
+1. linux kernel / libc mismatch may mean CLOCK id's are available at build
   'configure' (HAVE_CLOCK_MONOTONIC) but are unavailable at run time.
+
+1. Can't really be resolved without some indirection in the api. I think it's best to enable
+all implementations which are valid at configure time. This doesn't prevent the api from
+underpining a more sophisticated implementation but doesn't penalize the majority of users
+with a more cluttered api.
 
 ERRORs
 ------
@@ -50,6 +53,9 @@ ignores the return code from gettimeofday.
 
 spanclock_ xxx is designed to be used during development to narrow down
 performance issues.
+
+We assume the api user prefers api simplicity over any attempts at hand holding.
+
 
 ERRORS - Windows
 ----------------
