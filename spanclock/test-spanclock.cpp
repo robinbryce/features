@@ -10,72 +10,72 @@
 
 void print_ctr(spanc_val ctr){
 #if defined SPANCLOCK_VAL_TIMESPEC
-    printf("tv_sec = %ld, tv_nsec = %ld", ctr.tv_sec, ctr.tv_nsec);
+	printf("tv_sec = %ld, tv_nsec = %ld", ctr.tv_sec, ctr.tv_nsec);
 #elif defined SPANCLOCK_VAL_TIMEVAL
-    printf("tv_sec = %ld, tv_usec = %ld", ctr.tv_sec, ctr.tv_usec);
+	printf("tv_sec = %ld, tv_usec = %ld", ctr.tv_sec, ctr.tv_usec);
 #elif defined SPANCLOCK_QUERYPERFORMANCECOUNTER
-    printf("counts = %d", ctr.QuadPart);
+	printf("counts = %d", ctr.QuadPart);
 #endif
 }
 void print_scaled(spanc_val ctr) {
-    double sec = spanclock_seconds(ctr);
-    if (sec >= 1e-3)
-        printf ("%.0f ms", sec * 1e3);
-    else if (sec >= 1e-6)
-        printf ("%.0f us", sec * 1e6);
-    else
-        printf ("%.0f ns", sec * 1e9);
+	double sec = spanclock_seconds(ctr);
+	if (sec >= 1e-3)
+			printf ("%.0f ms", sec * 1e3);
+	else if (sec >= 1e-6)
+			printf ("%.0f us", sec * 1e6);
+	else
+			printf ("%.0f ns", sec * 1e9);
 }
 
 int test_set(void){
 
-    spanc_val v1, v2, v3;
+	spanc_val v1, v2, v3;
 
-    printf("[--------------------------------------]\n");
-    printf("[test_set]\n");
+	printf("[--------------------------------------]\n");
+	printf("[test_set]\n");
 
-    printf("_usec_set 1000000L (1.000)\n");
-    spanclock_usec_set(&v1, 1000000L);
-    print_ctr(v1); printf("\n");
-    printf("_seconds() -> %f\n", spanclock_seconds(v1));
+	printf("_usec_set 1000000L (1.000)\n");
+	spanclock_usec_set(&v1, 1000000L);
+	print_ctr(v1); printf("\n");
+	printf("_seconds() -> %f\n", spanclock_seconds(v1));
 
-    printf("_usec_set 1001000L (1.001)\n");
-    spanclock_usec_set(&v1, 1001000L);
-    print_ctr(v1); printf("\n");
-    printf("_seconds() -> %f\n", spanclock_seconds(v1));
+	printf("_usec_set 1001000L (1.001)\n");
+	spanclock_usec_set(&v1, 1001000L);
+	print_ctr(v1); printf("\n");
+	printf("_seconds() -> %f\n", spanclock_seconds(v1));
 
-    printf("_usec_set 1012000L (1.012)\n");
-    spanclock_usec_set(&v1, 1012000L);
-    print_ctr(v1); printf("\n");
-    printf("_seconds() -> %f\n", spanclock_seconds(v1));
+	printf("_usec_set 1012000L (1.012)\n");
+	spanclock_usec_set(&v1, 1012000L);
+	print_ctr(v1); printf("\n");
+	printf("_seconds() -> %f\n", spanclock_seconds(v1));
 
-    printf("_usec_set 500000L (0.5)\n");
-    spanclock_usec_set(&v1, 500000L);
-    print_ctr(v1); printf("\n");
-    printf("_seconds() -> %f\n", spanclock_seconds(v1));
+	printf("_usec_set 500000L (0.5)\n");
+	spanclock_usec_set(&v1, 500000L);
+	print_ctr(v1); printf("\n");
+	printf("_seconds() -> %f\n", spanclock_seconds(v1));
 
 
-    printf("_dset_sec 1.0\n");
-    spanclock_dset_sec(&v1, 1.0);
-    print_ctr(v1); printf("\n");
-    printf("_seconds() -> %f\n", spanclock_seconds(v1));
+	printf("_dset_sec 1.0\n");
+	spanclock_dset_sec(&v1, 1.0);
+	print_ctr(v1); printf("\n");
+	printf("_seconds() -> %f\n", spanclock_seconds(v1));
 
-    printf("_dset_sec 1.001\n");
-    spanclock_dset_sec(&v1, 1.001);
-    print_ctr(v1); printf("\n");
-    printf("_seconds() -> %f\n", spanclock_seconds(v1));
+	printf("_dset_sec 1.001\n");
+	spanclock_dset_sec(&v1, 1.001);
+	print_ctr(v1); printf("\n");
+	printf("_seconds() -> %f\n", spanclock_seconds(v1));
 
-    printf("_dset_sec 1.012\n");
-    spanclock_dset_sec(&v1, 1.012);
-    print_ctr(v1); printf("\n");
-    printf("_seconds() -> %f\n", spanclock_seconds(v1));
+	printf("_dset_sec 1.012\n");
+	spanclock_dset_sec(&v1, 1.012);
+	print_ctr(v1); printf("\n");
+	printf("_seconds() -> %f\n", spanclock_seconds(v1));
 
-    printf("_dset_sec 0.5\n");
-    spanclock_dset_sec(&v1, 0.5);
-    print_ctr(v1); printf("\n");
-    printf("_seconds() -> %f\n", spanclock_seconds(v1));
+	printf("_dset_sec 0.5\n");
+	spanclock_dset_sec(&v1, 0.5);
+	print_ctr(v1); printf("\n");
+	printf("_seconds() -> %f\n", spanclock_seconds(v1));
 
-    return 0;
+	return 0;
 }
 
 TEST(spanclock, diffcmp_add_sub){
@@ -211,7 +211,7 @@ TEST(spanclock, measure){
 
 int main(int argc, char**argv){
 
-    ::testing::InitGoogleTest(&argc, argv);
+	::testing::InitGoogleTest(&argc, argv);
 
-    return RUN_ALL_TESTS();
+	return RUN_ALL_TESTS();
 }
