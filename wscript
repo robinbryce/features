@@ -123,6 +123,7 @@ def configure(conf):
 
         conf.load('gcc')
         conf.env.CFLAGS = ['-g']
+        conf.env.CXXFLAGS = ['-g']
 
         if conf.env.DEST_OS.startswith('win'):
             # If we are mingw-gcc we need -mwindows, note that DEST_OS is
