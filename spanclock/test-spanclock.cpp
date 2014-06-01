@@ -27,64 +27,42 @@ void print_scaled(spanc_val ctr) {
 			printf ("%.0f ns", sec * 1e9);
 }
 
-int test_set(void){
+TEST(spanclock,set){
 
 	spanc_val v1, v2, v3;
 
-	printf("[--------------------------------------]\n");
-	printf("[test_set]\n");
-
-	printf("_usec_set 1000000L (1.000)\n");
 	spanclock_usec_set(&v1, 1000000L);
-	print_ctr(v1); printf("\n");
-	printf("_seconds() -> %f\n", spanclock_seconds(v1));
+	EXPECT_FLOAT_EQ(1.0, spanclock_seconds(v1));
 
-	printf("_usec_set 1001000L (1.001)\n");
 	spanclock_usec_set(&v1, 1001000L);
-	print_ctr(v1); printf("\n");
-	printf("_seconds() -> %f\n", spanclock_seconds(v1));
+	EXPECT_FLOAT_EQ(1.001, spanclock_seconds(v1));
 
-	printf("_usec_set 1012000L (1.012)\n");
 	spanclock_usec_set(&v1, 1012000L);
-	print_ctr(v1); printf("\n");
-	printf("_seconds() -> %f\n", spanclock_seconds(v1));
+	EXPECT_FLOAT_EQ(1.012, spanclock_seconds(v1));
 
-	printf("_usec_set 500000L (0.5)\n");
 	spanclock_usec_set(&v1, 500000L);
-	print_ctr(v1); printf("\n");
-	printf("_seconds() -> %f\n", spanclock_seconds(v1));
+	EXPECT_FLOAT_EQ(0.5, spanclock_seconds(v1));
 
-
-	printf("_dset_sec 1.0\n");
 	spanclock_dset_sec(&v1, 1.0);
-	print_ctr(v1); printf("\n");
-	printf("_seconds() -> %f\n", spanclock_seconds(v1));
+	EXPECT_FLOAT_EQ(1.0, spanclock_seconds(v1));
 
-	printf("_dset_sec 1.001\n");
 	spanclock_dset_sec(&v1, 1.001);
-	print_ctr(v1); printf("\n");
-	printf("_seconds() -> %f\n", spanclock_seconds(v1));
+	EXPECT_FLOAT_EQ(1.001, spanclock_seconds(v1));
 
-	printf("_dset_sec 1.012\n");
 	spanclock_dset_sec(&v1, 1.012);
-	print_ctr(v1); printf("\n");
-	printf("_seconds() -> %f\n", spanclock_seconds(v1));
+	EXPECT_FLOAT_EQ(1.012, spanclock_seconds(v1));
 
-	printf("_dset_sec 0.5\n");
 	spanclock_dset_sec(&v1, 0.5);
-	print_ctr(v1); printf("\n");
-	printf("_seconds() -> %f\n", spanclock_seconds(v1));
-
-	return 0;
+	EXPECT_FLOAT_EQ(0.5, spanclock_seconds(v1));
 }
 
 TEST(spanclock, diffcmp_add_sub){
 
 	spanc_val a, b, b2;
 
-	spanclock_usec_set(&a, 500000L);
-	spanclock_usec_set(&b, 500000L);
-	spanclock_usec_set(&b2, 500001L);
+	spanclock_usec_set(& a,  500000L);
+	spanclock_usec_set(& b,  500000L);
+	spanclock_usec_set(&b2, 1250000L);
 
 	EXPECT_EQ(spanclock_cmp(a,b), 0);
 	EXPECT_EQ(spanclock_diffcmp0(a,b), 0);
@@ -101,8 +79,8 @@ TEST(spanclock, diffcmp_add_sub){
 	EXPECT_FLOAT_EQ(1.0, spanclock_seconds(spanclock_add(b, a)));
 	EXPECT_FLOAT_EQ(0.0, spanclock_seconds(spanclock_sub(b, a)));
 
-	EXPECT_FLOAT_EQ(1.000001, spanclock_seconds(spanclock_add(a, b2)));
-	EXPECT_FLOAT_EQ(-0.000001, spanclock_seconds(spanclock_sub(a, b2)));
+	EXPECT_FLOAT_EQ(1.750000, spanclock_seconds(spanclock_add(a, b2)));
+	EXPECT_FLOAT_EQ(-0.750000, spanclock_seconds(spanclock_sub(a, b2)));
 
 	spanclock_usec_set(&a, 1500000L);
 	spanclock_usec_set(&b, 1500000L);
